@@ -1,0 +1,121 @@
+{
+  "name": "Activador de Mail BusquedaEmpleo",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 22,
+              "triggerAtMinute": 43
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "40d5e84c-49ed-4576-aba2-e4fd22cde4f9",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM ofertas_infojobs \nWHERE created_at >= NOW() - INTERVAL '24 HOURS' \nORDER BY match_score DESC;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "fed045b5-55bc-434d-89b3-ee10452d7345",
+      "name": "Execute a SQL query"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Si un día el mercado está parado y no hay nada nuevo, salimos elegantemente\nif (items.length === 0) {\n    return [{ json: { cuerpo_email: \"<div style='font-family: Arial; color: #555;'><p>Hoy no se han detectado ofertas nuevas en las últimas 24 horas.</p></div>\" } }];\n}\n\n// Inicializamos los contenedores de texto para cada categoría\nlet prioridadAlta = \"\";\nlet prioridadMedia = \"\";\nlet prioridadBaja = \"\";\n\n// Iteramos sobre el array de ofertas para maquetar y clasificar\nfor (const item of items) {\n  let oferta = item.json;\n  \n  // Plantilla HTML limpia para cada tarjeta de oferta\n  let tarjetaOferta = `\n    <div style=\"margin-bottom: 15px; padding: 15px; border-left: 4px solid #3498db; background-color: #f8f9fa; border-radius: 4px; font-family: Arial, sans-serif;\">\n      <span style=\"font-size: 14px; color: #7f8c8d; font-weight: bold; float: right;\">Match: ${oferta.match_score}%</span>\n      <b style=\"font-size: 16px; color: #2c3e50; display: block; max-width: 80%;\">${oferta.titulo}</b>\n      <span style=\"font-size: 14px; color: #34495e; display: block; margin-top: 3px;\">🏢 ${oferta.empresa}</span>\n      <p style=\"margin: 8px 0; font-size: 14px; color: #555; line-height: 1.4;\">💡 <i>${oferta.motivo}</i></p>\n      <a href=\"${oferta.enlace}\" target=\"_blank\" style=\"color: #3498db; text-decoration: none; font-weight: bold; font-size: 14px;\">Postularse ahora →</a>\n    </div>\n  `;\n\n  // Clasificamos la tarjeta en su sección correspondiente según la nota de la IA\n  if (oferta.match_score >= 80) {\n    prioridadAlta += tarjetaOferta;\n  } else if (oferta.match_score >= 50) {\n    prioridadMedia += tarjetaOferta;\n  } else {\n    prioridadBaja += tarjetaOferta;\n  }\n}\n\n// Construimos el esqueleto del correo ensamblando las categorías existentes\nlet htmlFinal = \"<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 10px;'>\";\nhtmlFinal += \"<h2 style='color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; margin-bottom: 20px;'>📋 Reporte de Captación de Talento</h2>\";\n\nif (prioridadAlta) {\n  htmlFinal += \"<h3 style='color: #e74c3c; margin-top: 30px; border-bottom: 1px dashed #e74c3c; padding-bottom: 5px;'>🔥 Imprescindibles (Match ≥ 80%)</h3>\" + prioridadAlta;\n}\n\nif (prioridadMedia) {\n  htmlFinal += \"<h3 style='color: #f39c12; margin-top: 30px; border-bottom: 1px dashed #f39c12; padding-bottom: 5px;'>📈 Posiciones de Interés (50% - 79%)</h3>\" + prioridadMedia;\n}\n\nif (prioridadBaja) {\n  htmlFinal += \"<h3 style='color: #95a5a6; margin-top: 30px; border-bottom: 1px dashed #95a5a6; padding-bottom: 5px;'>⏳ Revisión Secundaria (< 50%)</h3>\" + prioridadBaja;\n}\n\nhtmlFinal += \"</div>\";\n\nreturn [{ json: { cuerpo_email: htmlFinal } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "26296155-ce4a-4e85-a0e0-aca5e43dd034",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fromEmail": "TU_CORREO_ORIGEN@gmail.com",
+        "toEmail": "TU_CORREO_DESTINO@gmail.com",
+        "subject": "Reporte Diario de Ofertas IT",
+        "html": "={{ $json.cuerpo_email }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "1e1bab87-f7aa-4fcf-9808-eb0d34cae010",
+      "name": "Send an Email",
+      "webhookId": "tu-webhook-id-anonimizado"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "823191d4-d8c2-4c84-8562-4dfc110c5dad",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c3793371fc0fb561047d4c2c9dde76ad3e2db3bcf67907f215107ac0653f0f56"
+  },
+  "nodeGroups": [],
+  "id": "TOBSdRqzV6RlyTJg",
+  "tags": []
+}

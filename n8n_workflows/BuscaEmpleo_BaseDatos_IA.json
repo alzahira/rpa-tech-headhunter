@@ -1,0 +1,422 @@
+{
+  "name": "BuscaEmpleo_BaseDatos_IA",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tu-endpoint-anonimizado",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1808,
+        -416
+      ],
+      "id": "a10c5ff5-abba-416b-9786-63ca5656f936",
+      "name": "Webhook",
+      "webhookId": "tu-webhook-id-anonimizado"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "116efa51-f139-42a9-9ac5-a6e40ec1a76f",
+              "leftValue": "={{ $json.body.Titulo }}",
+              "rightValue": "senior",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "77c09594-fcc1-4f0a-97ec-20702a350335",
+              "leftValue": "={{ $json.body.Titulo }}",
+              "rightValue": "lead",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "a12b2d5d-2971-4fd5-aa49-57bde11cd064",
+              "leftValue": "={{ $json.body.Titulo }}",
+              "rightValue": "5 años",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "d2d3e4de-4677-4ecc-9594-138410aa142d",
+              "leftValue": "={{ $json.body.Titulo }}",
+              "rightValue": "ingeniero",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1584,
+        -416
+      ],
+      "id": "efde3be7-566a-4ab1-9ff1-f0410af439b8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "ofertas_infojobs",
+          "mode": "list",
+          "cachedResultName": "ofertas_infojobs"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "enlace",
+              "value": "={{ $json.body.Enlace }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1344,
+        -400
+      ],
+      "id": "cae1ddc5-eff1-429e-98bb-8b25cbc45fb4",
+      "name": "Select rows from a table",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1cc24654-8fef-41c1-ae46-2c2ad327f718",
+              "leftValue": "={{ $json.enlace }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1152,
+        -400
+      ],
+      "id": "a62dca33-41da-4d21-88ba-22a3f60843c2",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "ofertas_infojobs",
+          "mode": "list",
+          "cachedResultName": "ofertas_infojobs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "titulo": "={{ $('Webhook').item.json.body.Titulo }}",
+            "empresa": "={{ $('Webhook').item.json.body.Empresa }}",
+            "enlace": "={{ $('Webhook').item.json.body.Enlace }}",
+            "created_at": "={{ $now }}",
+            "match_score": "={{ $json.match_score }}",
+            "motivo": "={{ $json.motivo }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "titulo",
+              "displayName": "titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "empresa",
+              "displayName": "empresa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "enlace",
+              "displayName": "enlace",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "match_score",
+              "displayName": "match_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "motivo",
+              "displayName": "motivo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -432,
+        -416
+      ],
+      "id": "d4908148-697e-40ec-a412-3605f5bf41e3",
+      "name": "Insert rows in a table"
+    },
+    {
+      "parameters": {
+        "chatId": "TU_CHAT_ID",
+        "text": "=🚨 ¡NUEVA OFERTA RECOMENDADA! 🚨  \n\n💼 Puesto: {{ $('Webhook').item.json.body.Titulo }} \n🏢 Empresa: {{ $('Webhook').item.json.body.Empresa }} \n🔗 Enlace para aplicar: {{ $('Webhook').item.json.body.Enlace }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -192,
+        -416
+      ],
+      "id": "c3ac8c39-6bb0-4043-b25c-ca1cf5acc5cd",
+      "name": "Send a text message",
+      "webhookId": "tu-webhook-id-anonimizado"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un Headhunter técnico experto. Tu trabajo es analizar vacantes tecnológicas y calcular un \"Match Score\" del 0 al 100 evaluando si encajan con mi perfil profesional.\n\nMI PERFIL:\n- Formación: Desarrollo de Aplicaciones Multiplataforma (DAM).\n- Lenguajes core: Java, C#, Python, JavaScript.\n- Especialización: Técnico certificado en automatización RPA (200 horas). \n- Herramientas y ecosistema: Power Automate, UiPath, n8n, Appsmith, integraciones API y bases de datos relacionales.\n- Objetivo: Posiciones de desarrollo puro, backend o automatización. \n\nDATOS DE LA OFERTA:\nTítulo: {{ $('Webhook').item.json.body.Titulo }}\nEmpresa: {{ $('Webhook').item.json.body.Empresa }}\n\nINSTRUCCIONES ESTRICTAS:\nCompara los requisitos habituales del título de la oferta con mi perfil. Devuelve ÚNICAMENTE un objeto JSON válido con este formato exacto, sin comillas invertidas de código (markdown) ni texto introductorio:\n\n{\n  \"match_score\": [número entero del 0 al 100],\n  \"motivo\": \"[Frase corta y directa justificando la nota. Ejemplo: 'Piden Java y es tu lenguaje core' o 'El título sugiere tecnologías ajenas a tu stack']\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -944,
+        -416
+      ],
+      "id": "34a67727-6bad-4ae7-86fe-dfa82e8da3ec",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-safeguard-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        -208
+      ],
+      "id": "2f6ad0fd-9341-4c2d-907e-d143e9ba2627",
+      "name": "Groq Chat Model"
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResponse = $input.first().json.output// o el campo donde la IA deje su respuesta\nconst parsedData = JSON.parse(aiResponse);\nreturn parsedData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        -416
+      ],
+      "id": "57ddd98e-4837-433c-9fec-2a2935b7dc8a",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Select rows from a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select rows from a table": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3a2663ed-7839-47a5-bbbb-076f95adbffe",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c3793371fc0fb561047d4c2c9dde76ad3e2db3bcf67907f215107ac0653f0f56"
+  },
+  "nodeGroups": [],
+  "id": "V9vuOesLSUY7z1hs",
+  "tags": []
+}
