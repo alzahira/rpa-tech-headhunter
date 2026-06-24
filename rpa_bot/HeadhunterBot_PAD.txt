@@ -32,7 +32,7 @@ LOOP FOREACH CurrentItem IN ListaBusquedas
     LOOP FOREACH FilaOferta IN DataFromWebPage
         SET ObjetoOferta TO { 'Titulo': FilaOferta[0], 'Empresa': FilaOferta[1], 'Enlace': FilaOferta[2] }
         Variables.ConvertCustomObjectToJson CustomObject: ObjetoOferta Json=> JSONFinal
-        Web.InvokeWebService.InvokeWebServicePost Url: $'''https://limelight-ooze-cosmos.ngrok-free.dev/webhook/281c37df-ffff-4e49-80f6-03aa6151ef1f''' Accept: $'''application/json''' ContentType: $'''application/json''' RequestBody: JSONFinal ConnectionTimeout: 30 FollowRedirection: True ClearCookies: False FailOnErrorStatus: False EncodeRequestBody: False UserAgent: $'''Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6''' Encoding: Web.Encoding.AutoDetect AcceptUntrustedCertificates: False TrimRequestBody: True ResponseHeaders=> WebServiceResponseHeaders Response=> WebServiceResponse StatusCode=> StatusCode
+        Web.InvokeWebService.InvokeWebServicePost Url: $'''https://tu-dominio.ngrok-free.dev/webhook/TU-WEBHOOK-ID-AQUI''' Accept: $'''application/json''' ContentType: $'''application/json''' RequestBody: JSONFinal ConnectionTimeout: 30 FollowRedirection: True ClearCookies: False FailOnErrorStatus: False EncodeRequestBody: False UserAgent: $'''Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6''' Encoding: Web.Encoding.AutoDetect AcceptUntrustedCertificates: False TrimRequestBody: True ResponseHeaders=> WebServiceResponseHeaders Response=> WebServiceResponse StatusCode=> StatusCode
             ON ERROR
 
             END
@@ -82,7 +82,7 @@ FUNCTION Scraper_Tecnoempleo GLOBAL
         LOOP FOREACH FilaOferta IN DataFromWebPage
             SET ObjetoOferta TO { 'Titulo': FilaOferta[0], 'Empresa': FilaOferta[1], 'Enlace': FilaOferta[2] }
             Variables.ConvertCustomObjectToJson CustomObject: ObjetoOferta Json=> JSONFinal
-            Web.InvokeWebService.InvokeWebServicePost Url: $'''https://limelight-ooze-cosmos.ngrok-free.dev/webhook/281c37df-ffff-4e49-80f6-03aa6151ef1f''' Accept: $'''application/json''' ContentType: $'''application/json''' RequestBody: JSONFinal ConnectionTimeout: 30 FollowRedirection: True ClearCookies: False FailOnErrorStatus: False EncodeRequestBody: False UserAgent: $'''Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6''' Encoding: Web.Encoding.AutoDetect AcceptUntrustedCertificates: False TrimRequestBody: True ResponseHeaders=> WebServiceResponseHeaders Response=> WebServiceResponse StatusCode=> StatusCode
+            Web.InvokeWebService.InvokeWebServicePost Url: $'''https://tu-dominio.ngrok-free.dev/webhook/TU-WEBHOOK-ID-AQUI''' Accept: $'''application/json''' ContentType: $'''application/json''' RequestBody: JSONFinal ConnectionTimeout: 30 FollowRedirection: True ClearCookies: False FailOnErrorStatus: False EncodeRequestBody: False UserAgent: $'''Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6''' Encoding: Web.Encoding.AutoDetect AcceptUntrustedCertificates: False TrimRequestBody: True ResponseHeaders=> WebServiceResponseHeaders Response=> WebServiceResponse StatusCode=> StatusCode
             ON ERROR
 
             END
